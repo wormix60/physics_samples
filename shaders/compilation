@@ -1,0 +1,9 @@
+#!/bin/sh
+
+
+glslangValidator vertex.vert -V -o vert.spv 
+glslangValidator fragment.frag -V -o frag.spv
+glslangValidator shadow_vertex.vert -V -o shadow_vert.spv 
+glslangValidator shadow_fragment.frag -V -o shadow_frag.spv
+glslangValidator map_vertex.vert -V -o map_vert.spv 
+glslangValidator map_fragment.frag -V -o map_frag.spv
