@@ -1,12 +1,23 @@
-# СЦЕНА
+## PHYSICS SAMPLES
 
-Требуется FreeImagePlus и tiny obj loader
+**Required** *FreeImagePlus* and *tiny obj loader*
 
-./scene - запуск
+# BUILD
 
-Управление:
+    mkdir build
+    cd build
+    cmake ..
+    make
 
-- WS - движение камеры по направлению/против
-- AD - движение влево/вправо
-- мышка - поворот камеры
+# START
+    
+    ./scene
+
+# Control
+
+- WASD - move camera
+- mouse rotation - rotation camera
+- right click - "pause" mode
+- esc - exit
+
 
