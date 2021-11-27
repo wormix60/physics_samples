@@ -1,19 +1,19 @@
-## PHYSICS SAMPLES
+# PHYSICS SAMPLES
 
 **Required** *FreeImagePlus* and *tiny obj loader*
 
-# BUILD
+## BUILD
 
     mkdir build
     cd build
     cmake ..
     make
 
-# START
+## START
     
     ./scene
 
-# Control
+## Control
 
 - WASD - move camera
 - mouse rotation - rotation camera
