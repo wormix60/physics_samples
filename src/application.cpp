@@ -1,17 +1,38 @@
 #include "application.h" 
 
 
-unsigned Application::cam = 0;
+//unsigned Application::cam = 0;
 
-bool press_keys[1024];
+bool pressed_keys[1024];
+bool once_pressed_keys[1024];
+
+
+bool pressed_mouse_buttons[8];
+bool once_pressed_mouse_buttons[8];
+
+int cursor_entered;
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if(action == GLFW_PRESS) {
-        press_keys[key] = true;
+        pressed_keys[key] = true;
+        once_pressed_keys[key] = true;
+    } else if(action == GLFW_RELEASE) {
+        pressed_keys[key] = false;
     }
-    else if(action == GLFW_RELEASE) {
-        press_keys[key] = false;
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if(action == GLFW_PRESS) {
+        pressed_mouse_buttons[button] = true;
+        once_pressed_mouse_buttons[button] = true;
+    } else if(action == GLFW_RELEASE) {
+        pressed_mouse_buttons[button] = false;
     }
+}
+
+void cursorEnterCallback(GLFWwindow* window, int entered) {
+    cursor_entered = entered;
+    std::cout << cursor_entered << std::endl;
 }
 
 
@@ -38,11 +59,13 @@ void Application::initWindow() {
     window = glfwCreateWindow(WIDTH, HEIGHT, "Scene", nullptr, nullptr);
 
     glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetCursorEnterCallback(window, cursorEnterCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPos(window, 0, 0);
     glfwGetCursorPos(window, &prevMousePosX, &prevMousePosY);
     
     if (glfwRawMouseMotionSupported()){
-        std::cout << "Support" << std::endl;
         glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     }
 }
@@ -187,6 +210,9 @@ void Application::createResources() {
 
 
 void Application::setScene() {
+    cam = 0;
+    mode = PLAY;
+
     // world settings
     lowerBoundX = -100.0f;
     upperBoundX =  300.0f;
@@ -258,9 +284,7 @@ void Application::setScene() {
     vkUnmapMemory(device, vertBufferMemory);
 
 
-    //shadow
-
-    
+    //shadow    
 
     vkMapMemory(device, shadowBufferMemory, 0, 2 * sizeof(glm::mat4), 0, &mappedMemory);
         
@@ -397,8 +421,6 @@ void Application::setScene() {
     objects[9].setTexture(image);
     objects[9].gen();
 
-#ifndef NADV_MODELS 
-
     objects.resize(12);
 
     begPos = {50.0f, 0.0f, 50.0f};
@@ -421,110 +443,134 @@ void Application::setScene() {
     objects[11].setTexture(image);
     objects[11].gen();
     
-#endif
 }
 
 
 void Application::setPlayer() {
-    // fix
+
     
     glm::mat4 conv = glm::rotate(glm::mat4(1.0f), -playerAngleY, glm::vec3(0.0f, 1.0f, 0.0f));
               conv = glm::rotate(conv, -playerAngleX, glm::vec3(1.0f, 0.0f, 0.0f));
 
-
-    if (press_keys[GLFW_KEY_F1]) {
-        cam = 0;
-    } 
-    if (press_keys[GLFW_KEY_F2]) {
-        cam = 1;
-    }
-
-    double mousePosX, mousePosY;
-    glfwGetCursorPos(window, &mousePosX, &mousePosY);
-
-
-    playerAngleY += (mousePosX - prevMousePosX) * playerAddY; 
-    if (playerAngleY > 2.0f * M_PIF) {
-        playerAngleY -= 2.0f * M_PIF;
-    }
-
-    if (playerAngleY < 0.0f) {
-        playerAngleY += 2.0f * M_PIF;
-    }
-
-    playerAngleX += (mousePosY - prevMousePosY) * playerAddX; 
-
-    if (playerAngleX > 0.5f * M_PIF) {
-        playerAngleX = 0.5f * M_PIF;
-    }
-    if (playerAngleX < -0.5f * M_PIF) {
-        playerAngleX = -0.5f * M_PIF;
-    }
-
-    prevMousePosX = mousePosX;
-    prevMousePosY = mousePosY;
-
-    if (press_keys[GLFW_KEY_W]) {
-        glm::vec4 pos = {0.0f, 0.0f, -1.0f, 0.0f};
-
-        pos = conv * pos;
-
-        playerPosX += playerAddF * pos[0];
-        playerPosY += playerAddF * pos[1];
-        playerPosZ += playerAddF * pos[2];
-    }
-    if (press_keys[GLFW_KEY_S]) {
-        glm::vec4 pos = {0.0f, 0.0f, 1.0f, 0.0f};
-
-        pos = conv * pos;
-
-        playerPosX += playerAddB * pos[0];
-        playerPosY += playerAddB * pos[1];
-        playerPosZ += playerAddB * pos[2];
-    }
-    if (press_keys[GLFW_KEY_A]) {
-        glm::vec4 pos = {-1.0f, 0.0f, 0.0f, 0.0f};
-
-        pos = conv * pos;
-
-        playerPosX += playerAddS * pos[0];
-        playerPosY += playerAddS * pos[1];
-        playerPosZ += playerAddS * pos[2];
-    }
-    if (press_keys[GLFW_KEY_D]) {
-        glm::vec4 pos = {1.0f, 0.0f, 0.0f, 0.0f};
-
-        pos = conv * pos;
-
-        playerPosX += playerAddS * pos[0];
-        playerPosY += playerAddS * pos[1];
-        playerPosZ += playerAddS * pos[2];
-    }
-    if(press_keys[GLFW_KEY_ESCAPE]) {
+    if(pressed_keys[GLFW_KEY_ESCAPE]) {
         glfwSetWindowShouldClose(window, GL_TRUE);
         return;
     }
 
 
-    if (playerPosX < lowerBoundX) {
-        playerPosX = lowerBoundX;
+    if (pressed_keys[GLFW_KEY_F1]) {
+        cam = 0;
     } 
-    if (playerPosX > upperBoundX) {
-        playerPosX = upperBoundX;
-    } 
-    if (playerPosY < lowerBoundY) {
-        playerPosY = lowerBoundY;
-    } 
-    if (playerPosY > upperBoundY) {
-        playerPosY = upperBoundY;
-    } 
-    if (playerPosZ < lowerBoundZ) {
-        playerPosZ = lowerBoundZ;
-    } 
-    if (playerPosZ > upperBoundZ) {
-        playerPosZ = upperBoundZ;
-    } 
+    if (pressed_keys[GLFW_KEY_F2]) {
+        cam = 1;
+    }
 
+    if (once_pressed_mouse_buttons[GLFW_MOUSE_BUTTON_RIGHT]) {
+        if (mode == PLAY) {
+            mode = PAUSE;
+
+            glfwGetCursorPos(window, &prevMousePosX, &prevMousePosY);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPos(window, WIDTH / 2, HEIGHT / 2);
+            
+        } else if (mode == PAUSE) {
+            mode = PLAY;
+
+            if (cursor_entered) {
+
+                prevMousePosX = WIDTH / 2;
+                prevMousePosY = HEIGHT / 2;
+            }
+
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPos(window, prevMousePosX, prevMousePosY);
+        }
+        once_pressed_mouse_buttons[GLFW_MOUSE_BUTTON_RIGHT] = false;
+    }
+
+    if (mode == PLAY) {
+
+        double mousePosX, mousePosY;
+        glfwGetCursorPos(window, &mousePosX, &mousePosY);
+
+        playerAngleY += (mousePosX - prevMousePosX) * playerAddY; 
+        while (playerAngleY > 2.0f * M_PIF) {
+            playerAngleY -= 2.0f * M_PIF;
+        }
+
+        while (playerAngleY < 0.0f) {
+            playerAngleY += 2.0f * M_PIF;
+        }
+
+        playerAngleX += (mousePosY - prevMousePosY) * playerAddX; 
+
+        if (playerAngleX > 0.5f * M_PIF) {
+            playerAngleX = 0.5f * M_PIF;
+        }
+        if (playerAngleX < -0.5f * M_PIF) {
+            playerAngleX = -0.5f * M_PIF;
+        }
+
+        prevMousePosX = mousePosX;
+        prevMousePosY = mousePosY;
+
+        if (pressed_keys[GLFW_KEY_W]) {
+            glm::vec4 pos = {0.0f, 0.0f, -1.0f, 0.0f};
+
+            pos = conv * pos;
+
+            playerPosX += playerAddF * pos[0];
+            playerPosY += playerAddF * pos[1];
+            playerPosZ += playerAddF * pos[2];
+        }
+        if (pressed_keys[GLFW_KEY_S]) {
+            glm::vec4 pos = {0.0f, 0.0f, 1.0f, 0.0f};
+
+            pos = conv * pos;
+
+            playerPosX += playerAddB * pos[0];
+            playerPosY += playerAddB * pos[1];
+            playerPosZ += playerAddB * pos[2];
+        }
+        if (pressed_keys[GLFW_KEY_A]) {
+            glm::vec4 pos = {-1.0f, 0.0f, 0.0f, 0.0f};
+
+            pos = conv * pos;
+
+            playerPosX += playerAddS * pos[0];
+            playerPosY += playerAddS * pos[1];
+            playerPosZ += playerAddS * pos[2];
+        }
+        if (pressed_keys[GLFW_KEY_D]) {
+            glm::vec4 pos = {1.0f, 0.0f, 0.0f, 0.0f};
+
+            pos = conv * pos;
+
+            playerPosX += playerAddS * pos[0];
+            playerPosY += playerAddS * pos[1];
+            playerPosZ += playerAddS * pos[2];
+        }
+
+
+        if (playerPosX < lowerBoundX) {
+            playerPosX = lowerBoundX;
+        } 
+        if (playerPosX > upperBoundX) {
+            playerPosX = upperBoundX;
+        } 
+        if (playerPosY < lowerBoundY) {
+            playerPosY = lowerBoundY;
+        } 
+        if (playerPosY > upperBoundY) {
+            playerPosY = upperBoundY;
+        } 
+        if (playerPosZ < lowerBoundZ) {
+            playerPosZ = lowerBoundZ;
+        } 
+        if (playerPosZ > upperBoundZ) {
+            playerPosZ = upperBoundZ;
+        } 
+    }
 
     float posX = playerPosX;
     float posY = playerPosY;
@@ -532,15 +578,6 @@ void Application::setPlayer() {
 
     float angleX = playerAngleX;
     float angleY = playerAngleY;
-/*
-
-    float posX = 130.0f + 40.0f * cosf(objPos + M_PIF / 6.0f);
-    float posY = 40.0f + 10.0f * sinf(3.0f * objPos);
-    float posZ = 70.0f + 40.0f * -sinf(objPos + M_PIF / 6.0f);
-
-    float angleX = 0.0f;
-    float angleY = -(objPos + M_PIF / 6.0f + M_PIF);
-*/
 
     glm::vec3 pos = {posX, posY, posZ};
 
@@ -560,6 +597,24 @@ void Application::setPlayer() {
     mats[0] = conv;
 
     vkUnmapMemory(device, vertBufferMemory);
+}
+
+
+void Application::updateScene() {
+    if (time / TICK > 0) {
+        setPlayer();
+        
+        unsigned add = time / TICK;
+        
+        sec += add;
+        if (sec * TICK > 1000000) {
+            sec = 0;
+            std::cout << fps << std::endl;
+            fps = 0;
+        }
+    }
+
+    time %= TICK;
 }
 
 
@@ -1965,35 +2020,6 @@ void Application::createDepthResources(VkDevice a_device, VkPhysicalDevice a_phy
     viewInfo.subresourceRange.layerCount     = 1;
 
     VK_CHECK_RESULT(vkCreateImageView(a_device, &viewInfo, nullptr, a_pImageView));
-}
-
-
-void Application::updateScene() {
-
-
-    if (time / TICK > 0) {
-        setPlayer();
-        
-        unsigned add = time / TICK;
-        
-        /*
-        objPos += (float)add * M_PIF / 144.0f;
-
-        Point3 begPos = {130.0f + 40.0f * cosf(objPos), 40.0f + 10.0f * sinf(3.0f * objPos), 70.0f + 40.0f * -sinf(objPos)};
-
-        objects[9].setPos(begPos, 0.0f, objPos, 0.0f);
-        objects[9].setNormals();
-        objects[9].updatePos();
-        */
-        sec += add;
-        if (sec * TICK > 1000000) {
-            sec = 0;
-            std::cout << fps << std::endl;
-            fps = 0;
-        }
-    }
-
-    time %= TICK;
 }
 
 

@@ -40,10 +40,16 @@ const bool enableValidationLayers = true;
 #endif
 
 
-extern bool press_keys[1024];
+extern bool pressed_keys[1024];
+extern bool once_pressed_keys[1024];
+extern bool pressed_mouse_buttons[8];
+extern bool once_pressed_mouse_buttons[8];
+extern int cursor_entered;
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
+void cursorEnterCallback(GLFWwindow* window, int entered);
 
 const int WIDTH  = 1600;
 const int HEIGHT = 900;
@@ -52,6 +58,9 @@ const float M_PIF = acosf(-1.0f);
 const long long TICK = 25000;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
+
+#define PLAY 0
+#define PAUSE 1
 
 
 #include "object.h"
@@ -272,7 +281,8 @@ private:
     
     unsigned vertOffset;
 
-    static unsigned cam;
+    unsigned cam;
+    unsigned mode;
 
     float playerPosX;
     float playerPosY;
