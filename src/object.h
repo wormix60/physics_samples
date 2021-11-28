@@ -9,18 +9,6 @@
 
 #include "texture.h"
 
-struct Point2{
-    float x;
-    float y;
-};
-
-struct Point3{
-    float x;
-    float y;
-    float z;
-};
-
-
 struct Color{
     float r;
     float g;
@@ -30,9 +18,9 @@ struct Color{
 
 
 struct PolygonPoint{
-    Point3 ver;
-    Point2 tex;
-    Point3 norm;
+    glm::vec3 ver;
+    glm::vec2 tex;
+    glm::vec3 norm;
 };
 
 
@@ -69,17 +57,17 @@ public:
 
     void setTexture(const Image &_image);
 
-    void genCube(Point3 begVertex, float sizeX, float sizeY, float sizeZ,
+    void genCube(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
             float angleX, float angleY, float angleZ);
-    void genCube2(Point3 begVertex, float sizeX, float sizeY, float sizeZ,
+    void genCube2(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
             float angleX, float angleY, float angleZ);
-    void genField(Point3 begVertex, float sizeX, float sizeZ,
-            float angleX, float angleY, float angleZ);
-
-    void loadModel(Point3 begVertex, const char *modelPath, float scale,
+    void genField(glm::vec3 beg, float sizeX, float sizeZ,
             float angleX, float angleY, float angleZ);
 
-    void setPos(Point3 begVertex, float angleX, float angleY, float angleZ);
+    void loadModel(glm::vec3 beg, const char *modelPath, float scale,
+            float angleX, float angleY, float angleZ);
+
+    void setPos(glm::vec3 beg, float angleX, float angleY, float angleZ);
     void setNormals();
     void gen();
     void updatePos();

@@ -1,25 +1,8 @@
 #include "object.h"
 
 
-Point3 operator-(Point3 a, Point3 b) {
-    Point3 ret = {a.x - b.x, a.y - b.y, a.z - b.z};
-
-    return ret;
-}
-
-
-Point3 crossProd(Point3 a, Point3 b) {
-    Point3 cross = {-a.y * b.z + a.z * b.y, a.x * b.z - a.z * b.x, -a.x * b.y + a.y * b.x};
-
-    return cross;
-}
-
-
-
-void Object::genCube(Point3 begVertex, float sizeX, float sizeY, float sizeZ,
+void Object::genCube(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
         float angleX, float angleY, float angleZ){
-
-    glm::vec3 beg = {begVertex.x, begVertex.y, begVertex.z};
 
     rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
     rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -96,10 +79,8 @@ void Object::genCube(Point3 begVertex, float sizeX, float sizeY, float sizeZ,
 
 
 
-void Object::genCube2(Point3 begVertex, float sizeX, float sizeY, float sizeZ,
+void Object::genCube2(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
         float angleX, float angleY, float angleZ){
-
-    glm::vec3 beg = {begVertex.x, begVertex.y, begVertex.z};
 
     rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
     rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -180,10 +161,8 @@ void Object::genCube2(Point3 begVertex, float sizeX, float sizeY, float sizeZ,
 }
 
 
-void Object::genField(Point3 begVertex, float sizeX, float sizeZ,
+void Object::genField(glm::vec3 beg, float sizeX, float sizeZ,
         float angleX, float angleY, float angleZ){
-
-    glm::vec3 beg = {begVertex.x, begVertex.y, begVertex.z};
 
     rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
     rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -207,10 +186,8 @@ void Object::genField(Point3 begVertex, float sizeX, float sizeZ,
 }
 
 
-void Object::loadModel(Point3 begVertex, const char *modelPath, float scale,
+void Object::loadModel(glm::vec3 beg, const char *modelPath, float scale,
         float angleX, float angleY, float angleZ) {
-
-    glm::vec3 beg = {begVertex.x, begVertex.y, begVertex.z};
 
     rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
     rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -299,8 +276,7 @@ void Object::setTexture(const Image &_image) {
 }
 
 
-void Object::setPos(Point3 begVertex, float angleX, float angleY, float angleZ) {
-    glm::vec3 beg = {begVertex.x, begVertex.y, begVertex.z};
+void Object::setPos(glm::vec3 beg, float angleX, float angleY, float angleZ) {
 
     rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
     rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -314,10 +290,10 @@ void Object::setPos(Point3 begVertex, float angleX, float angleY, float angleZ) 
 
 void Object::setNormals() {
     for (size_t i = 0; i < polygons.size(); i++) {
-        Point3 vec2 = polygons[i].ver2.ver - polygons[i].ver1.ver;
-        Point3 vec1 = polygons[i].ver3.ver - polygons[i].ver1.ver;
+        glm::vec3 vec2 = polygons[i].ver2.ver - polygons[i].ver1.ver;
+        glm::vec3 vec1 = polygons[i].ver3.ver - polygons[i].ver1.ver;
 
-        Point3 n = crossProd(vec1, vec2);
+        glm::vec3 n = glm::cross(vec2, vec1);
 
         polygons[i].ver1.norm = n;
         polygons[i].ver2.norm = n;

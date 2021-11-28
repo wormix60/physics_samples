@@ -145,7 +145,7 @@ void Application::setScene() {
     render.setFragBufferMemory(&lightPos);
     
 
-    Point3 begPos;
+    glm::vec3 begPos;
     Image image;
 
     objects.resize(11);
@@ -300,14 +300,14 @@ void Application::setPlayer() {
     if (once_pressed_keys[GLFW_KEY_P]) {
         objects.resize(12);
 
-            Point3 begPos = {130.0f, 20.0f, 80.0f};
-            Image image;
-    image.load("textures/moon.png");
+        glm::vec3 begPos = {130.0f, 20.0f, 80.0f};
+        Image image;
+        image.load("textures/moon.png");
 
-    objects[11].setRender(render.getObjectNecessary());
-    objects[11].loadModel(begPos, "models/moon.obj", 10, 0.0f, 0.0f, M_PIF / 2.0f);
-    objects[11].setTexture(image);
-    objects[11].gen();
+        objects[11].setRender(render.getObjectNecessary());
+        objects[11].loadModel(begPos, "models/moon.obj", 10, 0.0f, 0.0f, M_PIF / 2.0f);
+        objects[11].setTexture(image);
+        objects[11].gen();
 
         render.updateRender();
 

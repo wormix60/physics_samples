@@ -1420,9 +1420,10 @@ void Render::writeCommandBuffers(VkDevice a_device,
 
 
     std::vector<VkCommandBuffer>& commandBuffers = (*a_cmdBuffers);
-    
-    vkWaitForFences(a_device, 1, &a_pSyncObjs->inFlightFences[0], VK_TRUE, UINT64_MAX);
-    vkWaitForFences(a_device, 1, &a_pSyncObjs->inFlightFences[1], VK_TRUE, UINT64_MAX);
+    \
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+    vkWaitForFences(a_device, 1, &a_pSyncObjs->inFlightFences[i], VK_TRUE, UINT64_MAX);
+    }
 
     for (size_t i = 0; i < commandBuffers.size(); i++) {
 
