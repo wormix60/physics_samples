@@ -273,20 +273,24 @@ void Object::loadModel(Point3 begVertex, const char *modelPath, float scale,
 }
 
 
-void Object::setDevice(VkDevice _device, VkPhysicalDevice _physDevice, VkQueue _queue, VkCommandPool _commandPool, 
-        VkSampler _sampler, VkDescriptorPool _descriptorPool, VkDescriptorSetLayout _descriptorSetLayout, 
-        VkDescriptorPool _posDescriptorPool, VkDescriptorSetLayout _posDescriptorSetLayout) {
+void Object::setRender(ObjectNecessary objectNecessary) {
 
-    tex.setDevice(_device, _physDevice, _queue, _commandPool, _sampler, _descriptorPool, _descriptorSetLayout);
+    tex.setDevice(objectNecessary.device, 
+                  objectNecessary.physDevice, 
+                  objectNecessary.queue, 
+                  objectNecessary.commandPool, 
+                  objectNecessary.sampler, 
+                  objectNecessary.descriptorPool, 
+                  objectNecessary.descriptorSetLayout);
 
-    device = _device;
-    physDevice = _physDevice;
-    queue = _queue;
+    device                 = objectNecessary.device;
+    physDevice             = objectNecessary.physDevice;
+    queue                  = objectNecessary.queue;
 
-    commandPool = _commandPool;
+    commandPool            = objectNecessary.commandPool;
 
-    posDescriptorPool = _posDescriptorPool;
-    posDescriptorSetLayout = _posDescriptorSetLayout;
+    posDescriptorPool      = objectNecessary.posDescriptorPool;
+    posDescriptorSetLayout = objectNecessary.posDescriptorSetLayout;
 }
 
 

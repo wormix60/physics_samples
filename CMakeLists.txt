@@ -31,7 +31,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-add_executable(scene main.cpp src/vk_utils.h src/vk_utils.cpp src/image.h src/image.cpp src/application.h src/application.cpp src/object.h src/object.cpp src/texture.h src/texture.cpp src/light.h src/light.cpp)
+add_executable(scene main.cpp src/vk_utils.h src/vk_utils.cpp src/image.h src/image.cpp src/application.h src/application.cpp src/render.h src/render.cpp src/object.h src/object.cpp src/texture.h src/texture.cpp src/light.h src/light.cpp)
 
 set_target_properties(scene PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 

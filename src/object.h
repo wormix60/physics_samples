@@ -1,3 +1,5 @@
+#ifndef OBJECT_H
+#define OBJECT_H
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -47,11 +49,23 @@ struct Angle{
     float z;
 };
 
+
+struct ObjectNecessary{
+    VkDevice device;
+    VkPhysicalDevice physDevice;
+    VkQueue queue;
+    VkCommandPool commandPool; 
+    VkSampler sampler;
+    VkDescriptorPool descriptorPool; 
+    VkDescriptorSetLayout descriptorSetLayout; 
+    VkDescriptorPool posDescriptorPool; 
+    VkDescriptorSetLayout posDescriptorSetLayout;
+};
+
+
 class Object{
 public: 
-    void setDevice(VkDevice _device, VkPhysicalDevice _physDevice, VkQueue _queue, VkCommandPool _commandPool, 
-        VkSampler _sampler, VkDescriptorPool _descriptorPool, VkDescriptorSetLayout _descriptorSetLayout, 
-        VkDescriptorPool _posDescriptorPool, VkDescriptorSetLayout _posDescriptorSetLayout);
+    void setRender(ObjectNecessary objectNecessary);
 
     void setTexture(const Image &_image);
 
@@ -117,3 +131,5 @@ private:
     glm::mat4 pos;
     glm::mat4 rot;
 };
+
+#endif

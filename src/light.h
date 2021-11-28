@@ -24,14 +24,20 @@
 const int SHADOWMAP_WIDTH = 4096;
 const int SHADOWMAP_HEIGHT = 4096;
 
+struct LightNecessary{
+    VkDevice device;
+    VkPhysicalDevice physDevice;
+    VkRenderPass shadowMapRenderPass; 
+    VkDescriptorPool shadowMapPool;
+    VkDescriptorSetLayout shadowMapSetLayout;
+};
 
 class Light{
 public:
     void gen();
     void cleanup();
 
-    void setDevice(VkDevice _device, VkPhysicalDevice _physDevice, VkRenderPass _shadowMapRenderPass, 
-            VkDescriptorPool _shadowMapPool, VkDescriptorSetLayout _shadowMapSetLayout);
+    void setRender(LightNecessary lightNecessary);
 
     VkDescriptorSet getShadowMapSet() const;
     VkFramebuffer getShadowMapFramebuffer() const;

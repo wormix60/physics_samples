@@ -23,16 +23,15 @@ void Light::cleanup() {
 
 
 
-void Light::setDevice(VkDevice _device, VkPhysicalDevice _physDevice, VkRenderPass _shadowMapRenderPass, 
-        VkDescriptorPool _shadowMapPool, VkDescriptorSetLayout _shadowMapSetLayout) {
+void Light::setRender(LightNecessary lightNecessary) {
 
-    device = _device;
-    physDevice = _physDevice;
+    device = lightNecessary.device;
+    physDevice = lightNecessary.physDevice;
 
-    shadowMapRenderPass = _shadowMapRenderPass;
+    shadowMapRenderPass = lightNecessary.shadowMapRenderPass;
 
-    shadowMapPool = _shadowMapPool;
-    shadowMapSetLayout = _shadowMapSetLayout;
+    shadowMapPool = lightNecessary.shadowMapPool;
+    shadowMapSetLayout = lightNecessary.shadowMapSetLayout;
 }
 
 
