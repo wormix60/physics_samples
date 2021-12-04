@@ -68,6 +68,8 @@ private:
     VkSampler        shadowMapSampler;
     VkDescriptorSet  shadowMapSet;
     VkFramebuffer    shadowMapFramebuffer;
+
+    
     
 }; 
 

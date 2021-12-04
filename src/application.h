@@ -54,6 +54,7 @@ const long long TICK = 25000;
 #include "image.h"
 #include "light.h"
 #include "render.h"
+#include "camera.h"
 
 
 class Application{
@@ -63,7 +64,7 @@ public:
     void initWindow();
     void createResources();
     void setScene();
-    void setPlayer();
+    void setCamera();
     void mainLoop();
     void cleanup();
     void updateScene();
@@ -74,47 +75,33 @@ private:
 
     Render render;
 
-    size_t currentFrame = 0;
+    Camera camera;
 
-    long long time = 0;
-    std::chrono::high_resolution_clock::time_point startCycle;
-    std::chrono::high_resolution_clock::time_point endCycle;
-    
-    unsigned vertOffset;
+    std::vector<Object> objects;
 
-    unsigned cam;
+    Light light;
+
     unsigned mode;
-
-    float playerPosX;
-    float playerPosY;
-    float playerPosZ;
-
-    float playerAddF;
-    float playerAddS;
-    float playerAddB;
-
-    float playerAngleX;
-    float playerAngleY;
-    
-    float playerAddX;
-    float playerAddY;
 
     float lowerBoundX;
     float upperBoundX;
+
     float lowerBoundY;
     float upperBoundY;
+    
     float lowerBoundZ;
     float upperBoundZ;
 
     double prevMousePosX;
     double prevMousePosY;
 
-    std::vector<Object> objects;
 
-    Light light;
 
-    float objPos = 0.0f;
 
+    long long time = 0;
+    std::chrono::high_resolution_clock::time_point startCycle;
+    std::chrono::high_resolution_clock::time_point endCycle;
+    
     unsigned fps = 0;
     unsigned sec = 0;
 }; 

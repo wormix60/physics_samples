@@ -61,7 +61,7 @@ public:
     void init(GLFWwindow *_window, Light *_light, std::vector<Object> *_object);
     void initVulkan();
     void createResources();
-    void drawFrame(int cam, size_t *currentFrame);
+    void drawFrame();
     void cleanup();
     void updateRender();
 
@@ -72,6 +72,8 @@ public:
     VkDevice getDevice() const;
     ObjectNecessary getObjectNecessary() const;
     LightNecessary getLightNecessary() const;
+
+    void waitExecQueue();
 
     static void createShadowMapDescriptorPool(VkDevice a_device, VkDescriptorPool* a_pDSPool);
 
@@ -125,18 +127,11 @@ public:
 
     static void createTexShaderDescriptorSetLayout(VkDevice a_device, VkDescriptorSetLayout* a_pDSLayout);
 
-    static void createDebugRenderPass(VkDevice a_device, VkFormat a_swapChainImageFormat, VkFormat a_depthImageFormat,
-            VkRenderPass* a_pRenderPass);
-
     static void createRenderPass(VkDevice a_device, VkFormat a_swapChainImageFormat, VkFormat a_depthImageFormat,
             VkRenderPass* a_pRenderPass);
 
     static void createShadowMapRenderPass(VkDevice a_device, VkFormat a_depthImageFormat,
             VkRenderPass* a_pRenderPass);
-
-    static void createDebugPipeline(VkDevice a_device, VkExtent2D a_screenExtent, VkRenderPass a_renderPass,
-            VkPipelineLayout* a_pLayout, VkPipeline* a_pPipiline,
-            const VkDescriptorSetLayout &a_smdsLayout);
 
     static void createGraphicsPipeline(VkDevice a_device, VkExtent2D a_screenExtent, VkRenderPass a_renderPass,
             VkPipelineLayout* a_pLayout, VkPipeline* a_pPipiline,
@@ -157,14 +152,12 @@ public:
     static void writeCommandBuffers(VkDevice a_device, 
         std::vector<VkFramebuffer> a_swapChainFramebuffers, VkExtent2D a_frameBufferExtent,
         VkRenderPass a_renderPass, VkPipeline a_graphicsPipeline, VkPipelineLayout a_layout, 
-        std::vector<VkCommandBuffer>* a_cmdBuffers, std::vector<Object> *a_obj, unsigned a_cam,
+        std::vector<VkCommandBuffer>* a_cmdBuffers, std::vector<Object> *a_obj,
         const VkDescriptorSet &a_vds, 
         const VkDescriptorSet &a_fds,
         const VkDescriptorSet &a_sds,
         Light *a_light,        
-        VkRenderPass a_shadowMapRenderPass, VkPipeline a_shadowMapPipeline, VkPipelineLayout a_shadowMapLayout, 
-        VkRenderPass a_debugRenderPass, VkPipeline a_debugPipeline, VkPipelineLayout a_debugLayout,
-        SyncObj* a_pSyncObjs);
+        VkRenderPass a_shadowMapRenderPass, VkPipeline a_shadowMapPipeline, VkPipelineLayout a_shadowMapLayout);
 
     static void createSyncObjects(VkDevice a_device, SyncObj* a_pSyncObjs);
 
@@ -224,13 +217,8 @@ private:
     VkPipelineLayout shadowMapPipelineLayout;
     VkPipeline       shadowMapPipeline;
 
-    VkRenderPass     debugRenderPass;
-    VkPipelineLayout debugPipelineLayout;
-    VkPipeline       debugPipeline;
-
     VkCommandPool                commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
-    std::vector<VkCommandBuffer> shadowMapCommandBuffers;
 
     VkBuffer              vertBufferPos;
     VkBuffer              vertBufferLight;
@@ -265,6 +253,9 @@ private:
     std::vector<Object> *objects;
 
     unsigned vertOffset;
+
+
+    size_t currentFrame = 0;
 
 }; 
 

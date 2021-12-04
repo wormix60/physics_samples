@@ -1,15 +1,14 @@
 #include "object.h"
 
 
-void Object::genCube(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
-        float angleX, float angleY, float angleZ){
+void Object::genCube(glm::vec3 _pos, glm::vec3 _angle, glm::vec3 _size){
 
-    rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
-    rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
-    rot = glm::rotate(rot            , angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
+    pos = _pos;
+    angle = _angle;
 
-
-    pos = glm::translate(glm::mat4(1.0), beg);
+    float sizeX = _size.x;
+    float sizeY = _size.y;
+    float sizeZ = _size.z;
 
 
     polygons = {
@@ -79,15 +78,14 @@ void Object::genCube(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
 
 
 
-void Object::genCube2(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
-        float angleX, float angleY, float angleZ){
+void Object::genCube2(glm::vec3 _pos, glm::vec3 _angle, glm::vec3 _size){
 
-    rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
-    rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
-    rot = glm::rotate(rot            , angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
+    pos = _pos;
+    angle = _angle;
 
-
-    pos = glm::translate(glm::mat4(1.0), beg);
+    float sizeX = _size.x;
+    float sizeY = _size.y;
+    float sizeZ = _size.z;
 
 
     float texX  = 0.5f * sizeX / (sizeX + sizeZ);
@@ -161,15 +159,13 @@ void Object::genCube2(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
 }
 
 
-void Object::genField(glm::vec3 beg, float sizeX, float sizeZ,
-        float angleX, float angleY, float angleZ){
+void Object::genField(glm::vec3 _pos, glm::vec3 _angle, glm::vec2 _size){
 
-    rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
-    rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
-    rot = glm::rotate(rot            , angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
+    pos = _pos;
+    angle = _angle;
 
-
-    pos = glm::translate(glm::mat4(1.0), beg);
+    float sizeX = _size.x;
+    float sizeZ = _size.y;
 
     polygons = {
         {
@@ -186,15 +182,10 @@ void Object::genField(glm::vec3 beg, float sizeX, float sizeZ,
 }
 
 
-void Object::loadModel(glm::vec3 beg, const char *modelPath, float scale,
-        float angleX, float angleY, float angleZ) {
+void Object::loadModel(glm::vec3 _pos, glm::vec3 _angle, const char *modelPath, float scale) {
 
-    rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
-    rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
-    rot = glm::rotate(rot            , angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
-
-
-    pos = glm::translate(glm::mat4(1.0), beg);
+    pos = _pos;
+    angle = _angle;
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -252,7 +243,7 @@ void Object::loadModel(glm::vec3 beg, const char *modelPath, float scale,
 
 void Object::setRender(ObjectNecessary objectNecessary) {
 
-    tex.setDevice(objectNecessary.device, 
+    texture.setDevice(objectNecessary.device, 
                   objectNecessary.physDevice, 
                   objectNecessary.queue, 
                   objectNecessary.commandPool, 
@@ -272,19 +263,30 @@ void Object::setRender(ObjectNecessary objectNecessary) {
 
 
 void Object::setTexture(const Image &_image) {
-    tex.setTexture(_image);
+    texture.setTexture(_image);
 }
 
 
-void Object::setPos(glm::vec3 beg, float angleX, float angleY, float angleZ) {
+void Object::setPos(glm::vec3 _pos, glm::vec3 _angle) {
 
-    rot = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
-    rot = glm::rotate(rot            , angleY, glm::vec3(0.0f, 1.0f, 0.0f));
-    rot = glm::rotate(rot            , angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
+    pos = _pos;
+    angle = _angle;
+
+}
 
 
-    pos = glm::translate(glm::mat4(1.0), beg);
+void Object::updatePos() {
+    glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+              rotMat = glm::rotate(rotMat         , angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+              rotMat = glm::rotate(rotMat         , angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
+
+    glm::mat4 posMat = glm::translate(glm::mat4(1.0), pos);
+
+    VkCommandBuffer commandBuffer = beginCommands(device, commandPool);
+    vkCmdUpdateBuffer(commandBuffer, posBuffer, 0, sizeof(glm::mat4), &posMat);
+    vkCmdUpdateBuffer(commandBuffer, posBuffer, sizeof(glm::mat4), sizeof(glm::mat4), &rotMat);
+    endCommands(device, queue, commandPool, commandBuffer);
 }
 
 
@@ -302,7 +304,7 @@ void Object::setNormals() {
 }
 
 
-void Object::gen() {
+void Object::init() {
     createBuffers(device, physDevice, polygons.size() * sizeof(Polygon), &polygonBuffer, 
             2 * sizeof(glm::mat4), &posBuffer, &bufferMemory);
 
@@ -310,14 +312,6 @@ void Object::gen() {
 
     createPosDescriptorSet(device, posBuffer, sizeof(glm::mat4), &posDescriptorSetLayout,
             posDescriptorPool, &posSet);
-}
-
-
-void Object::updatePos() {
-    VkCommandBuffer commandBuffer = beginCommands(device, commandPool);
-    vkCmdUpdateBuffer(commandBuffer, posBuffer, 0, sizeof(glm::mat4), &pos);
-    vkCmdUpdateBuffer(commandBuffer, posBuffer, sizeof(glm::mat4), sizeof(glm::mat4), &rot);
-    endCommands(device, queue, commandPool, commandBuffer);
 }
 
 
@@ -358,8 +352,15 @@ void Object::update() {
 
     VkCommandBuffer commandBuffer = beginCommands(device, commandPool);
 
-    vkCmdUpdateBuffer(commandBuffer, posBuffer, 0, sizeof(glm::mat4), &pos);
-    vkCmdUpdateBuffer(commandBuffer, posBuffer, sizeof(glm::mat4), sizeof(glm::mat4), &rot);
+    glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+              rotMat = glm::rotate(rotMat         , angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+              rotMat = glm::rotate(rotMat         , angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+    glm::mat4 posMat = glm::translate(glm::mat4(1.0), pos);
+
+    vkCmdUpdateBuffer(commandBuffer, posBuffer, 0, sizeof(glm::mat4), &posMat);
+    vkCmdUpdateBuffer(commandBuffer, posBuffer, sizeof(glm::mat4), sizeof(glm::mat4), &rotMat);
 
     VkBufferCopy region = {};
     region.size = polygons.size() * sizeof(Polygon);
@@ -374,7 +375,7 @@ void Object::update() {
 
 
 void Object::cleanup() {
-    tex.cleanup();
+    texture.cleanup();
 
     vkFreeMemory(device, bufferMemory, NULL);
     vkDestroyBuffer(device, polygonBuffer, NULL); 
@@ -388,7 +389,7 @@ VkBuffer Object::getBuffer() const {
 
 
 VkDescriptorSet Object::getPolygonDescriptorSet() const {
-    return tex.getDescriptorSet();
+    return texture.getDescriptorSet();
 }
 
 

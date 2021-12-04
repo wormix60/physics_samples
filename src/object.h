@@ -57,19 +57,15 @@ public:
 
     void setTexture(const Image &_image);
 
-    void genCube(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
-            float angleX, float angleY, float angleZ);
-    void genCube2(glm::vec3 beg, float sizeX, float sizeY, float sizeZ,
-            float angleX, float angleY, float angleZ);
-    void genField(glm::vec3 beg, float sizeX, float sizeZ,
-            float angleX, float angleY, float angleZ);
+    void genCube(glm::vec3 _pos, glm::vec3 _angle, glm::vec3 _size);
+    void genCube2(glm::vec3 _pos, glm::vec3 _angle, glm::vec3 _size);
+    void genField(glm::vec3 _pos, glm::vec3 _angle, glm::vec2 _size);
 
-    void loadModel(glm::vec3 beg, const char *modelPath, float scale,
-            float angleX, float angleY, float angleZ);
+    void loadModel(glm::vec3 _pos, glm::vec3 _angle, const char *modelPath, float scale);
 
-    void setPos(glm::vec3 beg, float angleX, float angleY, float angleZ);
+    void setPos(glm::vec3 _pos, glm::vec3 _angle);
     void setNormals();
-    void gen();
+    void init();
     void updatePos();
     void update();
     void cleanup();
@@ -105,7 +101,7 @@ private:
 
     std::vector<Polygon> polygons = {};
 
-    Texture tex;
+    Texture texture;
 
 
     VkDeviceMemory  bufferMemory;
@@ -115,9 +111,9 @@ private:
 
     VkDescriptorSet posSet;
 
+    glm::vec3 pos;
+    glm::vec3 angle;
 
-    glm::mat4 pos;
-    glm::mat4 rot;
 };
 
 #endif
